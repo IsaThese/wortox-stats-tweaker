@@ -299,18 +299,44 @@ TUNING.WORTOX_HEAL = 5
 end
 
 
-if GetModConfigData("wortoxhungermult") == 6 then
-  TUNING.WORTOX_FOOD_MULT = 1.5
-elseif GetModConfigData("wortoxhungermult") == 5 then
-TUNING.WORTOX_FOOD_MULT = 1.25
-elseif GetModConfigData("wortoxhungermult") == 4 then
-TUNING.WORTOX_FOOD_MULT = 1
-elseif GetModConfigData("wortoxhungermult") == 3 then
-TUNING.WORTOX_FOOD_MULT = .75
-elseif GetModConfigData("wortoxhungermult") == 2 then
-TUNING.WORTOX_FOOD_MULT = .50
-elseif GetModConfigData("wortoxhungermult") == 1 then
-TUNING.WORTOX_FOOD_MULT = .25
+-- Regular food absorption. Souls are separate. Defaults match vanilla (0.5).
+-- SetAbsorptionModifiers(health, hunger, sanity).
+local FOOD_MULT = {
+    [1] = 0, [2] = 0.25, [3] = 0.50, [4] = 0.75, [5] = 1, [6] = 1.25, [7] = 1.5,
+}
+TUNING.WORTOX_FOOD_NICE = {
+    health = FOOD_MULT[GetModConfigData("NiceFoodHealthMult")] or 0.5,
+    hunger = FOOD_MULT[GetModConfigData("NiceFoodHungerMult")] or 0.5,
+    sanity = FOOD_MULT[GetModConfigData("NiceFoodSanityMult")] or 0.5,
+}
+TUNING.WORTOX_FOOD_NAUGHTY = {
+    health = FOOD_MULT[GetModConfigData("NaughtyFoodHealthMult")] or 0.5,
+    hunger = FOOD_MULT[GetModConfigData("NaughtyFoodHungerMult")] or 0.5,
+    sanity = FOOD_MULT[GetModConfigData("NaughtyFoodSanityMult")] or 0.5,
+}
+TUNING.WORTOX_FOOD_NEUTRAL = {
+    health = FOOD_MULT[GetModConfigData("NeutralFoodHealthMult")] or 0.5,
+    hunger = FOOD_MULT[GetModConfigData("NeutralFoodHungerMult")] or 0.5,
+    sanity = FOOD_MULT[GetModConfigData("NeutralFoodSanityMult")] or 0.5,
+}
+-- Vanilla Create() reads this once; we re-apply per inclination below.
+TUNING.WORTOX_FOOD_MULT = TUNING.WORTOX_FOOD_NEUTRAL.hunger
+
+local function GetFoodMultsForInclination(inclination)
+    if inclination == "nice" then
+        return TUNING.WORTOX_FOOD_NICE
+    elseif inclination == "naughty" then
+        return TUNING.WORTOX_FOOD_NAUGHTY
+    end
+    return TUNING.WORTOX_FOOD_NEUTRAL
+end
+
+local function ApplyFoodMult(inst)
+    if inst.components.eater == nil then
+        return
+    end
+    local m = GetFoodMultsForInclination(inst.wortox_inclination)
+    inst.components.eater:SetAbsorptionModifiers(m.health, m.hunger, m.sanity)
 end
 
 -- Soul stacks use 40 or 60. Those are vanilla STACK_SIZE_SMALLITEM and
@@ -355,18 +381,26 @@ TUNING.STACK_SIZE_EXTRASMALLITEM = 40
 end
 
 -- Health, hunger, sanity, food, soul cap, and extract range come from TUNING.
--- Damage, absorption, and eating a soul are applied on the real Wortox prefab.
+-- Damage, absorption, food mult, and eating a soul are applied on the real Wortox prefab.
 AddPrefabPostInit("wortox", function(inst)
     -- TheWorld is still nil while the player prefab is first built.
     if TheWorld ~= nil and not TheWorld.ismastersim then
         return
     end
+
+    if inst.components.combat ~= nil then
+        inst.components.combat.damagemultiplier = TUNING.WORTOX_DAMAGEMULT
+    end
+    if inst.components.health ~= nil then
+        inst.components.health:SetAbsorptionAmount(TUNING.WORTOX_ABSORPTION)
+    end
+
+    ApplyFoodMult(inst)
+    inst:ListenForEvent("wortox_inclination_changed", ApplyFoodMult)
+
     if inst.components.souleater == nil then
         return
     end
-
-    inst.components.combat.damagemultiplier = TUNING.WORTOX_DAMAGEMULT
-    inst.components.health:SetAbsorptionAmount(TUNING.WORTOX_ABSORPTION)
 
     inst.components.souleater:SetOnEatSoulFn(function(eater)
         local stats = TUNING.WORTOX_SOUL_NEUTRAL
