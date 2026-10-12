@@ -1,7 +1,7 @@
 name = "Wortox Stats Tweak"
 description = "Allows you to change wortox's stats & soul stuff"
 author = "Isaac, Igor Howker"
-version = "1.0"
+version = "1.2.1.3"
 
 client_only_mod = false
 all_clients_require_mod = false
@@ -11,6 +11,9 @@ dst_compatible = true
 restart_require = false
 
 api_version = 10
+
+icon_atlas = "modicon.xml"
+icon = "modicon.tex"
 
 local function title(label)
     return {
