@@ -1,7 +1,7 @@
 name = "Wortox Stats Tweak"
 description = "Allows you to change wortox's stats & soul stuff"
 author = "Isaac, Igor Howker"
-version = "1.1.8"
+version = "1.0"
 
 client_only_mod = false
 all_clients_require_mod = false
