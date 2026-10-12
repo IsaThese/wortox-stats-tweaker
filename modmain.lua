@@ -404,7 +404,11 @@ end
 -- Health, hunger, sanity, food, soul cap, and extract range come from TUNING.
 -- Damage, absorption, and eating a soul are applied on the real Wortox prefab.
 AddPrefabPostInit("wortox", function(inst)
-    if not TheWorld.ismastersim then
+    -- TheWorld is still nil while the player prefab is first built.
+    if TheWorld ~= nil and not TheWorld.ismastersim then
+        return
+    end
+    if inst.components.souleater == nil then
         return
     end
 
@@ -417,4 +421,15 @@ AddPrefabPostInit("wortox", function(inst)
         eater.components.health:DoDelta(TUNING.HEALING_CUSTOM)
         eater:DoCheckSoulsAdded()
     end)
+end)
+
+-- The game soul has the sloweat tag the eat state requires. Only the stack limit is custom.
+AddPrefabPostInit("wortox_soul", function(inst)
+    if TheWorld ~= nil and not TheWorld.ismastersim then
+        return
+    end
+    if inst.components.stackable == nil then
+        return
+    end
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_EXTRASMALLITEM
 end)
