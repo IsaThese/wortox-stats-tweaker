@@ -1,7 +1,13 @@
 name = "Wortox Stats Tweak"
-description = "Allows you to change wortox's stats & soul stuff"
+description = [[Change Wortox's stats and soul settings with free-form numbers.
+
+Text fields need the client mod "Configs Extended" (workshop-3317960157) when you open Configure Mod. Joiners do not need it. Without it, only the default value shows as a single option; you can still set values in modoverrides.lua.
+
+Invalid / out-of-range values are clamped or fall back to vanilla (see server log).
+Day/night/hat sanity use flat per-minute rates (negatives OK). Food and items use multipliers (-10.00-10.00).
+Re-enter settings after updating from older index-based versions.]]
 author = "Isaac, Igor Howker"
-version = "1.2.1.4"
+version = "2.3.4"
 
 client_only_mod = false
 all_clients_require_mod = false
@@ -15,528 +21,271 @@ api_version = 10
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
-local function title(label)
+-- Configs Extended (optional): enables typing in Configure Mod.
+-- Not a hard mod_dependencies entry: CE is client-only; this mod is server-only.
+-- Author Remi allows other mods to use is_text_config / section_start / etc.
+
+local section_counter = 0
+local function AddSection(label, hover)
+    section_counter = section_counter + 1
     return {
-        name = "",
+        section_start = true,
+        name = "SECTION_" .. section_counter,
         label = label,
-        hover = "",
-        options = {{description = "", data = 0}},
-        default = 0,
+        hover = hover or "",
+        options = {{description = "", data = ""}},
+        default = "",
     }
 end
 
-local food_mult_options = {
-    {description = "0", data = 1, hover = "No food value (hunger, health, sanity)"},
-    {description = ".25", data = 2, hover = "25% from food"},
-    {description = "Default .50", data = 3, hover = "Vanilla 50% from food"},
-    {description = ".75", data = 4, hover = "75% from food"},
-    {description = "1", data = 5, hover = "Full food value"},
-    {description = "1.25", data = 6, hover = "125% from food"},
-    {description = "1.5", data = 7, hover = "150% from food"},
-}
+-- Free-form number via Configs Extended text input. data/default are strings;
+-- modmain validates, rounds, and clamps. modinfo sandbox has no tostring.
+-- Optional fields use default "vanilla" (never ""). An empty option description
+-- makes DST treat the row as a header, so Configs Extended cannot open text input.
+local function TextNumber(name, label, hover, default)
+    local s = default == nil and "vanilla" or ("" .. default)
+    if s == "" then
+        s = "vanilla"
+    end
+    return {
+        name = name,
+        label = label,
+        hover = hover,
+        options = {{description = s, data = s}},
+        default = s,
+        is_text_config = true,
+    }
+end
 
 configuration_options =
 {
-    title("Combat"),
-    {
-        name = "DamageMult",
-        label = "Wortox's damage multiplier.",
-        hover = "makes wortox deal increased/reduced damage.",
-        options =
-        {
-            {description = "-75%", data = 1, hover = "-75% damage dealt"},
-            {description = "-50%", data = 2, hover = "-50% damage dealt"},
-            {description = "-25%", data = 3, hover = "-25% damage dealt"},
-            {description = "-10%", data = 4, hover = "-10% damage dealt"},
-            {description = "Default", data = 5, hover = "Default damage dealt"},
-            {description = "+10%", data = 6, hover = "+10% damage dealt"},
-            {description = "+20%", data = 7, hover = "+20% damage dealt"},
-            {description = "+30%", data = 8, hover = "+30% damage dealt"},
-            {description = "+40%", data = 9, hover = "+40% damage dealt"},
-            {description = "+50%", data = 10, hover = "+50% damage dealt"},
-            {description = "+60%", data = 11, hover = "+60% damage dealt"},
-            {description = "+70%", data = 12, hover = "+70% damage dealt"},
-            {description = "+80%", data = 13, hover = "+80% damage dealt"},
-            {description = "+90%", data = 14, hover = "+90% damage dealt"},
-            {description = "+100%", data = 15, hover = "+100% damage dealt"},
-        },
-        default = 5,
-    },
-    {
-        name = "DamageAbsorption",
-        label = "Wortox's damage resistance.",
-        hover = "changes wortox damage resistance.",
-        options =
-        {
-            {description = "-100%", data = 1, hover = "-100% damage reduction"},
-            {description = "-50%", data = 2, hover = "-50% damage reduction"},
-            {description = "-25%", data = 3, hover = "-25% damage reduction"},
-            {description = "-10%", data = 4, hover = "-10% damage reduction"},
-            {description = "Default 0%", data = 5, hover = "Default 0% damage reduction"},
-            {description = "+10%", data = 6, hover = "+10% damage reduction"},
-            {description = "+20%", data = 7, hover = "+20% damage reduction"},
-            {description = "+25%", data = 8, hover = "+25% damage reduction"},
-            {description = "+30%", data = 9, hover = "+30% damage reduction"},
-            {description = "+40%", data = 10, hover = "+40% damage reduction"},
-            {description = "+50%", data = 11, hover = "+50% damage reduction"},
-            {description = "+65%", data = 12, hover = "+65% damage reduction"},
-        },
-        default = 5,
-    },
+    AddSection("Combat"),
+    TextNumber(
+        "DamageMult",
+        "Damage multiplier",
+        "Damage dealt mult. Range -10.00-10.00. Vanilla 1.",
+        1
+    ),
+    TextNumber(
+        "DamageAbsorption",
+        "Damage resistance",
+        "Absorption fraction (0.25 or 25 OK). Range -1.00-1.00. Vanilla 0.",
+        0
+    ),
 
-    title("Base Stats"),
-    {
-        name = "Health",
-        label = "Change wortox's health",
-        hover = "changes wortox's health.",
-        options =
-        {
-            {description = "25 hp", data = 1, hover = "Default - 175"},
-            {description = "50 hp", data = 2, hover = "Default - 150"},
-            {description = "75 hp", data = 3, hover = "Default - 125"},
-            {description = "100 hp", data = 4, hover = "Default - 100"},
-            {description = "125 hp", data = 5, hover = "Default - 75"},
-            {description = "150 hp", data = 6, hover = "Default - 50"},
-            {description = "175 hp", data = 7, hover = "Default - 25"},
-            {description = "200 hp", data = 8, hover = "Default wortox health"},
-            {description = "225 hp", data = 9, hover = "Default + 25"},
-            {description = "250 hp", data = 10, hover = "Default + 50"},
-            {description = "275 hp", data = 11, hover = "Default + 75"},
-            {description = "300 hp", data = 12, hover = "Default + 100"},
-        },
-        default = 8,
-    },
-    {
-        name = "Sanity",
-        label = "Change wortox's sanity",
-        hover = "Changes wortox's sanity.",
-        options =
-        {
-            {description = "25 sanity ", data = 1, hover = "Default - 125"},
-            {description = "50 sanity ", data = 2, hover = "Default - 100"},
-            {description = "75 sanity ", data = 3, hover = "Default - 75"},
-            {description = "100 sanity ", data = 4, hover = "Default - 50"},
-            {description = "125 sanity ", data = 5, hover = "Default -  25"},
-            {description = "150 sanity ", data = 6, hover = "Default Wortox sanity"},
-            {description = "175 sanity ", data = 7, hover = "Default +25"},
-            {description = "200 sanity ", data = 8, hover = "Default +50"},
-            {description = "225 sanity ", data = 9, hover = "Default +75"},
-            {description = "250 sanity ", data = 10, hover = "Wickerbottom sanity"},
-            {description = "275 sanity ", data = 11, hover = "Wickerbottom sanity +25"},
-            {description = "300 sanity ", data = 12, hover = "Wickerbottom sanity +50"},
-        },
-        default = 6,
-    },
-    {
-        name = "Hunger",
-        label = "Change wortox's hunger",
-        hover = "Changes wortox's hunger",
-        options =
-        {
-            {description = "25 Hunger ", data = 1, hover = "Default - 150"},
-            {description = "50 Hunger ", data = 2, hover = "Default - 125"},
-            {description = "75 Hunger ", data = 3, hover = "Default - 100"},
-            {description = "100 Hunger ", data = 4, hover = "Default - 75"},
-            {description = "125 Hunger", data = 5, hover = "Default - 50"},
-            {description = "150 Hunger ", data = 6, hover = "Default - 25"},
-            {description = "175 Hunger ", data = 7, hover = "Default Wortox hunger"},
-            {description = "200 Hunger ", data = 8, hover = "Default +25"},
-            {description = "225 Hunger ", data = 9, hover = "Default +50"},
-            {description = "250 Hunger ", data = 10, hover = "Default + 75"},
-            {description = "275 Hunger ", data = 11, hover = "Default + 100 "},
-            {description = "300 Hunger ", data = 12, hover = "Default + 125"},
-        },
-        default = 7,
-    },
-    {
-        name = "SanityAura",
-        label = "Wortox sanity aura.",
-        hover = "changes the sanity drain when near monsters.",
-        options =
-        {
-            {description = "0", data = 1, hover = "0"},
-            {description = "0.10", data = 2, hover = "0.10"},
-            {description = "0.20", data = 3, hover = "0.20"},
-            {description = "0.33", data = 4, hover = "0.33"},
-            {description = "Default 0.5", data = 5, hover = "Default 0.5"},
-            {description = "0.6", data = 6, hover = "0.6"},
-            {description = "0.7", data = 7, hover = "0.7"},
-            {description = "0.8", data = 8, hover = "0.8"},
-            {description = "0.9", data = 9, hover = "0.9"},
-            {description = "1.0", data = 10, hover = "1.0"},
-            {description = "1.25", data = 11, hover = "1.25"},
-            {description = "1.50", data = 12, hover = "1.5"},
-        },
-        default = 5,
-    },
+    AddSection("Base Stats"),
+    TextNumber(
+        "Health",
+        "Max health",
+        "Max health. Range 1-200. Vanilla 200.",
+        200
+    ),
+    TextNumber(
+        "Sanity",
+        "Max sanity",
+        "Max sanity. Range 1-200. Vanilla 150.",
+        150
+    ),
+    TextNumber(
+        "Hunger",
+        "Max hunger",
+        "Max hunger. Range 1-200. Vanilla 175.",
+        175
+    ),
+    TextNumber(
+        "SanityAura",
+        "Sanity aura mult",
+        "Monster sanity aura mult. Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "DaySanityPerMin",
+        "Day sanity / min",
+        "Day sanity per FULL minute (e.g. -50 is strong). Negatives drain. Range -200.0-200.0. Vanilla 0.",
+        0
+    ),
+    TextNumber(
+        "NightSanityPerMin",
+        "Night sanity / min",
+        "Night/caves sanity per FULL minute (replaces vanilla darkness). e.g. -50. Or type vanilla. Range -200.0-200.0.",
+        "vanilla"
+    ),
+    TextNumber(
+        "ItemSanityMult",
+        "Item sanity mult",
+        "Equipped item sanity mult. Range -10.00-10.00. Vanilla 1.",
+        1
+    ),
 
-    title("Soul Mechanics"),
-    {
-        name = "SoulhealRange",
-        label = "Wortox's heal range.",
-        hover = "changes wortox soul's heal range.",
-        options =
-        {
-            {description = "1", data = 1, hover = "1"},
-            {description = "3", data = 2, hover = "3"},
-            {description = "6", data = 3, hover = "6"},
-            {description = "Default 8", data = 4, hover = "Default 8"},
-            {description = "10", data = 5, hover = "10"},
-            {description = "12", data = 6, hover = "12"},
-            {description = "15", data = 7, hover = "15"},
-            {description = "20", data = 8, hover = "20"},
-            {description = "25", data = 9, hover = "25"},
-            {description = "30", data = 10, hover = "30"},
-            {description = "40", data = 11, hover = "40"},
-            {description = "50", data = 12, hover = "50"},
-        },
-        default = 4,
-    },
-    {
-        name = "SoulstealRange",
-        label = "From how far a soul flies.",
-        hover = "changes wortox soulsteal range.",
-        options =
-        {
-            {description = "1", data = 1, hover = "1"},
-            {description = "3", data = 2, hover = "3"},
-            {description = "6", data = 3, hover = "6"},
-            {description = "Default 8", data = 4, hover = "Default 8"},
-            {description = "10", data = 5, hover = "10"},
-            {description = "12", data = 6, hover = "12"},
-            {description = "15", data = 7, hover = "15"},
-            {description = "20", data = 8, hover = "20"},
-            {description = "25", data = 9, hover = "25"},
-            {description = "30", data = 10, hover = "30"},
-            {description = "40", data = 11, hover = "40"},
-            {description = "50", data = 12, hover = "50"},
-        },
-        default = 4,
-    },
-    {
-        name = "ExtractRange",
-        label = "Range things drop souls.",
-        hover = "changes wortox soul extract range.",
-        options =
-        {
-            {description = "5", data = 1, hover = "5"},
-            {description = "10", data = 2, hover = "10"},
-            {description = "15", data = 3, hover = "15"},
-            {description = "Default 20", data = 4, hover = "Default 20"},
-            {description = "25", data = 5, hover = "25"},
-            {description = "30", data = 6, hover = "30"},
-            {description = "35", data = 7, hover = "35"},
-            {description = "40", data = 8, hover = "40"},
-            {description = "45", data = 9, hover = "45"},
-            {description = "50", data = 10, hover = "50"},
-            {description = "55", data = 11, hover = "55"},
-            {description = "60", data = 12, hover = "60"},
-        },
-        default = 4,
-    },
-    {
-        name = "maxsouls",
-        label = "Change the max amount of souls wortox can have",
-        hover = "Changes the max amount of souls before overload",
-        options =
-        {
-            {description = "5 souls", data = 1 },
-            {description = "10 souls", data = 2 },
-            {description = "15 souls", data = 3 },
-            {description = "20 souls", data = 4 },
-            {description = "25 souls", data = 5 },
-            {description = "30 souls", data = 6 },
-            {description = "35 souls", data = 7 },
-            {description = "40 souls", data = 8 },
-            {description = "45 souls", data = 9 },
-            {description = "50 souls", data = 10 },
-            {description = "55 souls", data = 11 },
-            {description = "60 souls", data = 12 },
-        },
-        default = 4,
-    },
-    {
-        name = "Soulheal",
-        label = "changes the heal amount",
-        options =
-        {
-            {description = "5 health", data = 1 },
-            {description = "10 health", data = 2 },
-            {description = "15 health", data = 3 },
-            {description = "20 heath", data = 4 },
-            {description = "25 health", data = 5 },
-            {description = "30 health", data = 6 },
-            {description = "35 health", data = 7 },
-            {description = "40 health", data = 8 },
-            {description = "45 health", data = 9 },
-            {description = "50 health", data = 10 },
-            {description = "55 health", data = 11 },
-            {description = "60 health", data = 12 },
-        },
-        default = 4,
-    },
+    AddSection("Misc"),
+    TextNumber(
+        "TopHatSanityPerMin",
+        "Top Hat sanity / min",
+        "Top Hat sanity/min (negatives OK). Or type vanilla (~3.3). Range -200.0-200.0. Ignores Item mult.",
+        "vanilla"
+    ),
+    TextNumber(
+        "MagicianTopHatSanityPerMin",
+        "Magician Top Hat / min",
+        "Magician Top Hat sanity/min (negatives OK). Or type vanilla (~3.3). Range -200.0-200.0. Ignores Item mult.",
+        "vanilla"
+    ),
+    TextNumber(
+        "WalrusHatSanityPerMin",
+        "Tam o' Shanter / min",
+        "Tam o' Shanter sanity/min (negatives OK). Or type vanilla (~6.7). Range -200.0-200.0. Ignores Item mult.",
+        "vanilla"
+    ),
 
-    title("Soul Eating - Nice"),
-    {
-        name = "NiceSoulHunger",
-        label = "Hunger upon eating soul.",
-        hover = "Hunger gained when Nice Wortox eats a soul. Vanilla +25.",
-        options =
-        {
-            {description = "+0 hunger", data = 1, hover = "+0"},
-            {description = "+5 hunger", data = 2, hover = "+5"},
-            {description = "+8 hunger", data = 3, hover = "+8"},
-            {description = "+10 hunger", data = 4, hover = "+10"},
-            {description = "+12 hunger", data = 5, hover = "+12"},
-            {description = "+15 hunger", data = 6, hover = "+15"},
-            {description = "+18 hunger", data = 7, hover = "+18"},
-            {description = "+22 hunger", data = 8, hover = "+22"},
-            {description = "Default +25 hunger", data = 9, hover = "Vanilla +25"},
-            {description = "+30 hunger", data = 10, hover = "+30"},
-            {description = "+35 hunger", data = 11, hover = "+35"},
-            {description = "+40 hunger", data = 12, hover = "+40"},
-        },
-        default = 9,
-    },
-    {
-        name = "NiceSoulSanity",
-        label = "Sanity upon eating soul.",
-        hover = "Sanity change when Nice Wortox eats a soul. Vanilla -10.",
-        options =
-        {
-            {description = "-20 sanity", data = 1, hover = "-20"},
-            {description = "-15 sanity", data = 2, hover = "-15"},
-            {description = "Default -10 sanity", data = 3, hover = "Vanilla -10"},
-            {description = "-8 sanity", data = 4, hover = "-8"},
-            {description = "-5 sanity", data = 5, hover = "-5"},
-            {description = "-3 sanity", data = 6, hover = "-3"},
-            {description = "-1 sanity", data = 7, hover = "-1"},
-            {description = "+0 sanity", data = 8, hover = "+0"},
-            {description = "+1 sanity", data = 9, hover = "+1"},
-            {description = "+3 sanity", data = 10, hover = "+3"},
-            {description = "+5 sanity", data = 11, hover = "+5"},
-            {description = "+10 sanity", data = 12, hover = "+10"},
-        },
-        default = 3,
-    },
-    {
-        name = "NiceSoulHealth",
-        label = "Heal upon eating soul.",
-        hover = "Health gained when Nice Wortox eats a soul. Vanilla +0.",
-        options =
-        {
-            {description = "Default +0 hp", data = 1, hover = "Vanilla +0"},
-            {description = "+2.5 hp", data = 2, hover = "+2.5"},
-            {description = "+5 hp", data = 3, hover = "+5"},
-            {description = "+7.5 hp", data = 4, hover = "+7.5"},
-            {description = "+10 hp", data = 5, hover = "+10"},
-            {description = "+12.5 hp", data = 6, hover = "+12.5"},
-            {description = "+15 hp", data = 7, hover = "+15"},
-            {description = "+17.5 hp", data = 8, hover = "+17.5"},
-            {description = "+20 hp", data = 9, hover = "+20"},
-            {description = "+22.5 hp", data = 10, hover = "+22.5"},
-            {description = "+25 hp", data = 11, hover = "+25"},
-            {description = "+30 hp", data = 12, hover = "+30"},
-        },
-        default = 1,
-    },
+    AddSection("Soul Mechanics"),
+    TextNumber(
+        "SoulhealRange",
+        "Soul heal range",
+        "Soul heal range. Range 0-200. Vanilla 8.",
+        8
+    ),
+    TextNumber(
+        "SoulstealRange",
+        "Soul steal range",
+        "Soul fly-to range. Range 0-200. Vanilla 8.",
+        8
+    ),
+    TextNumber(
+        "ExtractRange",
+        "Soul extract range",
+        "Soul drop range. Range 0-200. Vanilla 20.",
+        20
+    ),
+    TextNumber(
+        "maxsouls",
+        "Max souls",
+        "Max souls before overload. Range 0-200. Vanilla 20.",
+        20
+    ),
+    TextNumber(
+        "Soulheal",
+        "Soul heal amount",
+        "Health from soul heal. Range 0-200. Vanilla 20.",
+        20
+    ),
 
-    title("Soul Eating - Naughty"),
-    {
-        name = "NaughtySoulHunger",
-        label = "Hunger upon eating soul.",
-        hover = "Hunger gained when Naughty Wortox eats a soul. Vanilla +25.",
-        options =
-        {
-            {description = "+0 hunger", data = 1, hover = "+0"},
-            {description = "+5 hunger", data = 2, hover = "+5"},
-            {description = "+8 hunger", data = 3, hover = "+8"},
-            {description = "+10 hunger", data = 4, hover = "+10"},
-            {description = "+12 hunger", data = 5, hover = "+12"},
-            {description = "+15 hunger", data = 6, hover = "+15"},
-            {description = "+18 hunger", data = 7, hover = "+18"},
-            {description = "+22 hunger", data = 8, hover = "+22"},
-            {description = "Default +25 hunger", data = 9, hover = "Vanilla +25"},
-            {description = "+30 hunger", data = 10, hover = "+30"},
-            {description = "+35 hunger", data = 11, hover = "+35"},
-            {description = "+40 hunger", data = 12, hover = "+40"},
-        },
-        default = 9,
-    },
-    {
-        name = "NaughtySoulSanity",
-        label = "Sanity upon eating soul.",
-        hover = "Sanity change when Naughty Wortox eats a soul. Vanilla +0.",
-        options =
-        {
-            {description = "-20 sanity", data = 1, hover = "-20"},
-            {description = "-15 sanity", data = 2, hover = "-15"},
-            {description = "-10 sanity", data = 3, hover = "-10"},
-            {description = "-8 sanity", data = 4, hover = "-8"},
-            {description = "-5 sanity", data = 5, hover = "-5"},
-            {description = "-3 sanity", data = 6, hover = "-3"},
-            {description = "-1 sanity", data = 7, hover = "-1"},
-            {description = "Default +0 sanity", data = 8, hover = "Vanilla +0"},
-            {description = "+1 sanity", data = 9, hover = "+1"},
-            {description = "+3 sanity", data = 10, hover = "+3"},
-            {description = "+5 sanity", data = 11, hover = "+5"},
-            {description = "+10 sanity", data = 12, hover = "+10"},
-        },
-        default = 8,
-    },
-    {
-        name = "NaughtySoulHealth",
-        label = "Heal upon eating soul.",
-        hover = "Health gained when Naughty Wortox eats a soul. Vanilla +0.",
-        options =
-        {
-            {description = "Default +0 hp", data = 1, hover = "Vanilla +0"},
-            {description = "+2.5 hp", data = 2, hover = "+2.5"},
-            {description = "+5 hp", data = 3, hover = "+5"},
-            {description = "+7.5 hp", data = 4, hover = "+7.5"},
-            {description = "+10 hp", data = 5, hover = "+10"},
-            {description = "+12.5 hp", data = 6, hover = "+12.5"},
-            {description = "+15 hp", data = 7, hover = "+15"},
-            {description = "+17.5 hp", data = 8, hover = "+17.5"},
-            {description = "+20 hp", data = 9, hover = "+20"},
-            {description = "+22.5 hp", data = 10, hover = "+22.5"},
-            {description = "+25 hp", data = 11, hover = "+25"},
-            {description = "+30 hp", data = 12, hover = "+30"},
-        },
-        default = 1,
-    },
+    AddSection("Soul Eating - Nice"),
+    TextNumber(
+        "NiceSoulHunger",
+        "Hunger upon eating soul",
+        "Nice eat-soul hunger. Range -200.0-200.0. Vanilla 25.",
+        25
+    ),
+    TextNumber(
+        "NiceSoulSanity",
+        "Sanity upon eating soul",
+        "Nice eat-soul sanity. Range -200.0-200.0. Vanilla -10.",
+        -10
+    ),
+    TextNumber(
+        "NiceSoulHealth",
+        "Heal upon eating soul",
+        "Nice eat-soul health. Range -200.0-200.0. Vanilla 0.",
+        0
+    ),
 
-    title("Soul Eating - Neutral"),
-    {
-        name = "NeutralSoulHunger",
-        label = "Hunger upon eating soul.",
-        hover = "Hunger gained when Neutral Wortox eats a soul. Vanilla +25.",
-        options =
-        {
-            {description = "+0 hunger", data = 1, hover = "+0"},
-            {description = "+5 hunger", data = 2, hover = "+5"},
-            {description = "+8 hunger", data = 3, hover = "+8"},
-            {description = "+10 hunger", data = 4, hover = "+10"},
-            {description = "+12 hunger", data = 5, hover = "+12"},
-            {description = "+15 hunger", data = 6, hover = "+15"},
-            {description = "+18 hunger", data = 7, hover = "+18"},
-            {description = "+22 hunger", data = 8, hover = "+22"},
-            {description = "Default +25 hunger", data = 9, hover = "Vanilla +25"},
-            {description = "+30 hunger", data = 10, hover = "+30"},
-            {description = "+35 hunger", data = 11, hover = "+35"},
-            {description = "+40 hunger", data = 12, hover = "+40"},
-        },
-        default = 9,
-    },
-    {
-        name = "NeutralSoulSanity",
-        label = "Sanity upon eating soul.",
-        hover = "Sanity change when Neutral Wortox eats a soul. Vanilla -5.",
-        options =
-        {
-            {description = "-20 sanity", data = 1, hover = "-20"},
-            {description = "-15 sanity", data = 2, hover = "-15"},
-            {description = "-10 sanity", data = 3, hover = "-10"},
-            {description = "-8 sanity", data = 4, hover = "-8"},
-            {description = "Default -5 sanity", data = 5, hover = "Vanilla -5"},
-            {description = "-3 sanity", data = 6, hover = "-3"},
-            {description = "-1 sanity", data = 7, hover = "-1"},
-            {description = "+0 sanity", data = 8, hover = "+0"},
-            {description = "+1 sanity", data = 9, hover = "+1"},
-            {description = "+3 sanity", data = 10, hover = "+3"},
-            {description = "+5 sanity", data = 11, hover = "+5"},
-            {description = "+10 sanity", data = 12, hover = "+10"},
-        },
-        default = 5,
-    },
-    {
-        name = "NeutralSoulHealth",
-        label = "Heal upon eating soul.",
-        hover = "Health gained when Neutral Wortox eats a soul. Vanilla +0.",
-        options =
-        {
-            {description = "Default +0 hp", data = 1, hover = "Vanilla +0"},
-            {description = "+2.5 hp", data = 2, hover = "+2.5"},
-            {description = "+5 hp", data = 3, hover = "+5"},
-            {description = "+7.5 hp", data = 4, hover = "+7.5"},
-            {description = "+10 hp", data = 5, hover = "+10"},
-            {description = "+12.5 hp", data = 6, hover = "+12.5"},
-            {description = "+15 hp", data = 7, hover = "+15"},
-            {description = "+17.5 hp", data = 8, hover = "+17.5"},
-            {description = "+20 hp", data = 9, hover = "+20"},
-            {description = "+22.5 hp", data = 10, hover = "+22.5"},
-            {description = "+25 hp", data = 11, hover = "+25"},
-            {description = "+30 hp", data = 12, hover = "+30"},
-        },
-        default = 1,
-    },
+    AddSection("Soul Eating - Naughty"),
+    TextNumber(
+        "NaughtySoulHunger",
+        "Hunger upon eating soul",
+        "Naughty eat-soul hunger. Range -200.0-200.0. Vanilla 25.",
+        25
+    ),
+    TextNumber(
+        "NaughtySoulSanity",
+        "Sanity upon eating soul",
+        "Naughty eat-soul sanity. Range -200.0-200.0. Vanilla 0.",
+        0
+    ),
+    TextNumber(
+        "NaughtySoulHealth",
+        "Heal upon eating soul",
+        "Naughty eat-soul health. Range -200.0-200.0. Vanilla 0.",
+        0
+    ),
 
-    title("Food - Nice"),
-    {
-        name = "NiceFoodHungerMult",
-        label = "Hunger from food.",
-        hover = "Hunger absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
-    {
-        name = "NiceFoodHealthMult",
-        label = "Health from food.",
-        hover = "Health absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
-    {
-        name = "NiceFoodSanityMult",
-        label = "Sanity from food.",
-        hover = "Sanity absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
+    AddSection("Soul Eating - Neutral"),
+    TextNumber(
+        "NeutralSoulHunger",
+        "Hunger upon eating soul",
+        "Neutral eat-soul hunger. Range -200.0-200.0. Vanilla 25.",
+        25
+    ),
+    TextNumber(
+        "NeutralSoulSanity",
+        "Sanity upon eating soul",
+        "Neutral eat-soul sanity. Range -200.0-200.0. Vanilla -5.",
+        -5
+    ),
+    TextNumber(
+        "NeutralSoulHealth",
+        "Heal upon eating soul",
+        "Neutral eat-soul health. Range -200.0-200.0. Vanilla 0.",
+        0
+    ),
 
-    title("Food - Naughty"),
-    {
-        name = "NaughtyFoodHungerMult",
-        label = "Hunger from food.",
-        hover = "Hunger absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
-    {
-        name = "NaughtyFoodHealthMult",
-        label = "Health from food.",
-        hover = "Health absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
-    {
-        name = "NaughtyFoodSanityMult",
-        label = "Sanity from food.",
-        hover = "Sanity absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
+    AddSection("Food - Nice"),
+    TextNumber(
+        "NiceFoodHungerMult",
+        "Hunger from food",
+        "Food hunger mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "NiceFoodHealthMult",
+        "Health from food",
+        "Food health mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "NiceFoodSanityMult",
+        "Sanity from food",
+        "Food sanity mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
 
-    title("Food - Neutral"),
-    {
-        name = "NeutralFoodHungerMult",
-        label = "Hunger from food.",
-        hover = "Hunger absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
-    {
-        name = "NeutralFoodHealthMult",
-        label = "Health from food.",
-        hover = "Health absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
-    {
-        name = "NeutralFoodSanityMult",
-        label = "Sanity from food.",
-        hover = "Sanity absorption from regular food (not souls). Vanilla 0.5.",
-        options = food_mult_options,
-        default = 3,
-    },
+    AddSection("Food - Naughty"),
+    TextNumber(
+        "NaughtyFoodHungerMult",
+        "Hunger from food",
+        "Food hunger mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "NaughtyFoodHealthMult",
+        "Health from food",
+        "Food health mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "NaughtyFoodSanityMult",
+        "Sanity from food",
+        "Food sanity mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+
+    AddSection("Food - Neutral"),
+    TextNumber(
+        "NeutralFoodHungerMult",
+        "Hunger from food",
+        "Food hunger mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "NeutralFoodHealthMult",
+        "Health from food",
+        "Food health mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
+    TextNumber(
+        "NeutralFoodSanityMult",
+        "Sanity from food",
+        "Food sanity mult (not souls). Range -10.00-10.00. Vanilla 0.5.",
+        0.5
+    ),
 }

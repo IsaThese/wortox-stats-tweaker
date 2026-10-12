@@ -1,323 +1,141 @@
 local TUNING = GLOBAL.TUNING
-STACK_SIZE_EXTRASMALLITEM = 60
+local math = GLOBAL.math
+local tonumber = GLOBAL.tonumber
+local tostring = GLOBAL.tostring
+local string = GLOBAL.string
 
-if GetModConfigData("DamageMult") == 15 then
-TUNING.WORTOX_DAMAGEMULT = 2.0
-elseif GetModConfigData("DamageMult") == 14 then
-TUNING.WORTOX_DAMAGEMULT = 1.9
-elseif GetModConfigData("DamageMult") == 13 then
-TUNING.WORTOX_DAMAGEMULT = 1.8
-elseif GetModConfigData("DamageMult") == 12 then
-TUNING.WORTOX_DAMAGEMULT = 1.7
-elseif GetModConfigData("DamageMult") == 11 then
-TUNING.WORTOX_DAMAGEMULT = 1.6
-elseif GetModConfigData("DamageMult") == 10 then
-TUNING.WORTOX_DAMAGEMULT = 1.5
-elseif GetModConfigData("DamageMult") == 9 then
-TUNING.WORTOX_DAMAGEMULT = 1.4
-elseif GetModConfigData("DamageMult") == 8 then
-TUNING.WORTOX_DAMAGEMULT = 1.3
-elseif GetModConfigData("DamageMult") == 7 then
-TUNING.WORTOX_DAMAGEMULT = 1.2
-elseif GetModConfigData("DamageMult") == 6 then
-TUNING.WORTOX_DAMAGEMULT = 1.1
-elseif GetModConfigData("DamageMult") == 5 then
-TUNING.WORTOX_DAMAGEMULT = 1.00
-elseif GetModConfigData("DamageMult") == 4 then
-TUNING.WORTOX_DAMAGEMULT = 0.9
-elseif GetModConfigData("DamageMult") == 3 then
-TUNING.WORTOX_DAMAGEMULT = 0.75
-elseif GetModConfigData("DamageMult") == 2 then
-TUNING.WORTOX_DAMAGEMULT = 0.5
-elseif GetModConfigData("DamageMult") == 1 then
-TUNING.WORTOX_DAMAGEMULT = 0.25
-end
-
-if GetModConfigData("DamageAbsorption") == 12 then
-TUNING.WORTOX_ABSORPTION = 0.65
-elseif GetModConfigData("DamageAbsorption") == 11 then
-TUNING.WORTOX_ABSORPTION = 0.5
-elseif GetModConfigData("DamageAbsorption") == 10 then
-TUNING.WORTOX_ABSORPTION = 0.4
-elseif GetModConfigData("DamageAbsorption") == 9 then
-TUNING.WORTOX_ABSORPTION = 0.3
-elseif GetModConfigData("DamageAbsorption") == 8 then
-TUNING.WORTOX_ABSORPTION = 0.25
-elseif GetModConfigData("DamageAbsorption") == 7 then
-TUNING.WORTOX_ABSORPTION = 0.2
-elseif GetModConfigData("DamageAbsorption") == 6 then
-TUNING.WORTOX_ABSORPTION = 0.1
-elseif GetModConfigData("DamageAbsorption") == 5 then
-TUNING.WORTOX_ABSORPTION = 0
-elseif GetModConfigData("DamageAbsorption") == 4 then
-TUNING.WORTOX_ABSORPTION = -0.1
-elseif GetModConfigData("DamageAbsorption") == 3 then
-TUNING.WORTOX_ABSORPTION = -0.25
-elseif GetModConfigData("DamageAbsorption") == 2 then
-TUNING.WORTOX_ABSORPTION = -0.5
-elseif GetModConfigData("DamageAbsorption") == 1 then
-TUNING.WORTOX_ABSORPTION = -1.0
-end
-
-if GetModConfigData("SoulhealRange") == 12 then
-TUNING.WORTOX_SOULHEAL_RANGE = 50
-elseif GetModConfigData("SoulhealRange") == 11 then
-TUNING.WORTOX_SOULHEAL_RANGE = 40
-elseif GetModConfigData("SoulhealRange") == 10 then
-TUNING.WORTOX_SOULHEAL_RANGE = 30
-elseif GetModConfigData("SoulhealRange") == 9 then
-TUNING.WORTOX_SOULHEAL_RANGE = 25
-elseif GetModConfigData("SoulhealRange") == 8 then
-TUNING.WORTOX_SOULHEAL_RANGE = 20
-elseif GetModConfigData("SoulhealRange") == 7 then
-TUNING.WORTOX_SOULHEAL_RANGE = 15
-elseif GetModConfigData("SoulhealRange") == 6 then
-TUNING.WORTOX_SOULHEAL_RANGE = 12
-elseif GetModConfigData("SoulhealRange") == 5 then
-TUNING.WORTOX_SOULHEAL_RANGE = 10
-elseif GetModConfigData("SoulhealRange") == 4 then
-TUNING.WORTOX_SOULHEAL_RANGE = 8
-elseif GetModConfigData("SoulhealRange") == 3 then
-TUNING.WORTOX_SOULHEAL_RANGE = 6
-elseif GetModConfigData("SoulhealRange") == 2 then
-TUNING.WORTOX_SOULHEAL_RANGE = 3
-elseif GetModConfigData("SoulhealRange") == 1 then
-TUNING.WORTOX_SOULHEAL_RANGE = 1
-end
-
-if GetModConfigData("SoulstealRange") == 12 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 50
-elseif GetModConfigData("SoulstealRange") == 11 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 40
-elseif GetModConfigData("SoulstealRange") == 10 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 30
-elseif GetModConfigData("SoulstealRange") == 9 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 25
-elseif GetModConfigData("SoulstealRange") == 8 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 20
-elseif GetModConfigData("SoulstealRange") == 7 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 15
-elseif GetModConfigData("SoulstealRange") == 6 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 12
-elseif GetModConfigData("SoulstealRange") == 5 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 10
-elseif GetModConfigData("SoulstealRange") == 4 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 8
-elseif GetModConfigData("SoulstealRange") == 3 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 6
-elseif GetModConfigData("SoulstealRange") == 2 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 3
-elseif GetModConfigData("SoulstealRange") == 1 then
-TUNING.WORTOX_SOULSTEALER_RANGE = 1
-end
-
-if GetModConfigData("ExtractRange") == 12 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 60
-elseif GetModConfigData("ExtractRange") == 11 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 55
-elseif GetModConfigData("ExtractRange") == 10 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 50
-elseif GetModConfigData("ExtractRange") == 9 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 45
-elseif GetModConfigData("ExtractRange") == 8 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 40
-elseif GetModConfigData("ExtractRange") == 7 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 35
-elseif GetModConfigData("ExtractRange") == 6 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 30
-elseif GetModConfigData("ExtractRange") == 5 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 25
-elseif GetModConfigData("ExtractRange") == 4 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 20
-elseif GetModConfigData("ExtractRange") == 3 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 15
-elseif GetModConfigData("ExtractRange") == 2 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 10
-elseif GetModConfigData("ExtractRange") == 1 then
-TUNING.WORTOX_SOULEXTRACT_RANGE = 5
-end
-
-if GetModConfigData("SanityAura") == 12 then
-TUNING.WORTOX_SANITY_AURA_MULT = 1.5
-elseif GetModConfigData("SanityAura") == 11 then
-TUNING.WORTOX_SANITY_AURA_MULT = 1.25
-elseif GetModConfigData("SanityAura") == 10 then
-TUNING.WORTOX_SANITY_AURA_MULT = 1.0
-elseif GetModConfigData("SanityAura") == 9 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.9
-elseif GetModConfigData("SanityAura") == 8 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.8
-elseif GetModConfigData("SanityAura") == 7 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.7
-elseif GetModConfigData("SanityAura") == 6 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.6
-elseif GetModConfigData("SanityAura") == 5 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.5
-elseif GetModConfigData("SanityAura") == 4 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.33
-elseif GetModConfigData("SanityAura") == 3 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.2
-elseif GetModConfigData("SanityAura") == 2 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0.1
-elseif GetModConfigData("SanityAura") == 1 then
-TUNING.WORTOX_SANITY_AURA_MULT = 0
-end
-
--- Config index -> eat-soul deltas. Defaults match vanilla OnEatSoul:
--- hunger CALORIES_MED (+25), sanity nice -10 / naughty 0 / neutral -5, health +0.
-local SOUL_HUNGER = {
-    [1] = 0, [2] = 5, [3] = 8, [4] = 10, [5] = 12, [6] = 15,
-    [7] = 18, [8] = 22, [9] = 25, [10] = 30, [11] = 35, [12] = 40,
-}
-local SOUL_SANITY = {
-    [1] = -20, [2] = -15, [3] = -10, [4] = -8, [5] = -5, [6] = -3,
-    [7] = -1, [8] = 0, [9] = 1, [10] = 3, [11] = 5, [12] = 10,
-}
-local SOUL_HEALTH = {
-    [1] = 0, [2] = 2.5, [3] = 5, [4] = 7.5, [5] = 10, [6] = 12.5,
-    [7] = 15, [8] = 17.5, [9] = 20, [10] = 22.5, [11] = 25, [12] = 30,
+-- Rules for free-form config numbers (Configs Extended text fields).
+-- mult:        multipliers, -10..10, 3 decimals
+-- absorb:      damage resistance as fraction; 25 or 0.25 both OK → clamp -1..1
+-- stat:        max health/hunger/sanity, 1..200 integers
+-- range:       distances / caps / heal amounts, 0..200 integers
+-- delta:       eat-soul deltas, -200..200, 1 decimal
+-- rate_per_min: continuous sanity/min, -200..200, 1 decimal
+local RULES = {
+    mult        = { min = -10,  max = 10,  places = 3 },
+    absorb      = { min = -1,   max = 1,   places = 3, percent = true },
+    stat        = { min = 1,    max = 200, places = 0 },
+    range       = { min = 0,    max = 200, places = 0 },
+    delta       = { min = -200, max = 200, places = 1 },
+    rate_per_min = { min = -200, max = 200, places = 1 },
 }
 
+local function Round(n, places)
+    local m = 10 ^ places
+    if n >= 0 then
+        return math.floor(n * m + 0.5) / m
+    end
+    return math.ceil(n * m - 0.5) / m
+end
+
+local function SanitizeNumber(raw, default, kind, name)
+    local rule = RULES[kind] or RULES.stat
+    local n = tonumber(raw)
+    if n == nil then
+        print(string.format(
+            "[Wortox Stats Tweak] Invalid '%s' (%s); using default %s",
+            name, tostring(raw), tostring(default)))
+        return default
+    end
+
+    -- Percentages: 25 → 0.25, -50 → -0.5. Values already in (-1,1] stay as-is.
+    if rule.percent then
+        local a = math.abs(n)
+        if a > 1 and a <= 100 then
+            n = n / 100
+        end
+    end
+
+    n = Round(n, rule.places)
+
+    if n < rule.min or n > rule.max then
+        local clamped = math.max(rule.min, math.min(rule.max, n))
+        print(string.format(
+            "[Wortox Stats Tweak] '%s' (%s) out of range [%s, %s]; clamped to %s",
+            name, tostring(n), tostring(rule.min), tostring(rule.max), tostring(clamped)))
+        n = clamped
+    end
+
+    return n
+end
+
+local function ConfigNumber(name, default, kind)
+    return SanitizeNumber(GetModConfigData(name), default, kind, name)
+end
+
+-- Empty / "vanilla" / non-numeric → nil (caller keeps vanilla behavior).
+local function ConfigNumberOrNil(name, kind)
+    local raw = GetModConfigData(name)
+    if raw == nil or raw == "" then
+        return nil
+    end
+    if type(raw) == "string" and string.lower(raw) == "vanilla" then
+        return nil
+    end
+    local n = tonumber(raw)
+    if n == nil then
+        print(string.format(
+            "[Wortox Stats Tweak] Invalid '%s' (%s); using vanilla",
+            name, tostring(raw)))
+        return nil
+    end
+    return SanitizeNumber(raw, nil, kind, name)
+end
+
+TUNING.WORTOX_DAMAGEMULT = ConfigNumber("DamageMult", 1, "mult")
+TUNING.WORTOX_ABSORPTION = ConfigNumber("DamageAbsorption", 0, "absorb")
+TUNING.WORTOX_SOULHEAL_RANGE = ConfigNumber("SoulhealRange", 8, "range")
+TUNING.WORTOX_SOULSTEALER_RANGE = ConfigNumber("SoulstealRange", 8, "range")
+TUNING.WORTOX_SOULEXTRACT_RANGE = ConfigNumber("ExtractRange", 20, "range")
+TUNING.WORTOX_SANITY_AURA_MULT = ConfigNumber("SanityAura", 0.5, "mult")
+TUNING.WORTOX_HEALTH = ConfigNumber("Health", 200, "stat")
+TUNING.WORTOX_SANITY = ConfigNumber("Sanity", 150, "stat")
+TUNING.WORTOX_HUNGER = ConfigNumber("Hunger", 175, "stat")
+TUNING.WORTOX_HEAL = ConfigNumber("Soulheal", 20, "range")
+TUNING.WORTOX_DAY_SANITY_PER_MIN = ConfigNumber("DaySanityPerMin", 0, "rate_per_min")
+TUNING.WORTOX_NIGHT_SANITY_PER_MIN = ConfigNumberOrNil("NightSanityPerMin", "rate_per_min")
+TUNING.WORTOX_ITEM_SANITY_MULT = ConfigNumber("ItemSanityMult", 1, "mult")
+
+-- Optional flat /min hat overrides. nil = vanilla dapperness (scaled by ItemSanityMult).
+TUNING.WORTOX_HAT_SANITY_PER_MIN = {
+    tophat = ConfigNumberOrNil("TopHatSanityPerMin", "rate_per_min"),
+    magician = ConfigNumberOrNil("MagicianTopHatSanityPerMin", "rate_per_min"),
+    walrushat = ConfigNumberOrNil("WalrusHatSanityPerMin", "rate_per_min"),
+}
+
+-- Eat-soul deltas. Defaults match vanilla OnEatSoul.
 TUNING.WORTOX_SOUL_NICE = {
-    hunger = SOUL_HUNGER[GetModConfigData("NiceSoulHunger")] or 25,
-    sanity = SOUL_SANITY[GetModConfigData("NiceSoulSanity")] or -10,
-    health = SOUL_HEALTH[GetModConfigData("NiceSoulHealth")] or 0,
+    hunger = ConfigNumber("NiceSoulHunger", 25, "delta"),
+    sanity = ConfigNumber("NiceSoulSanity", -10, "delta"),
+    health = ConfigNumber("NiceSoulHealth", 0, "delta"),
 }
 TUNING.WORTOX_SOUL_NAUGHTY = {
-    hunger = SOUL_HUNGER[GetModConfigData("NaughtySoulHunger")] or 25,
-    sanity = SOUL_SANITY[GetModConfigData("NaughtySoulSanity")] or 0,
-    health = SOUL_HEALTH[GetModConfigData("NaughtySoulHealth")] or 0,
+    hunger = ConfigNumber("NaughtySoulHunger", 25, "delta"),
+    sanity = ConfigNumber("NaughtySoulSanity", 0, "delta"),
+    health = ConfigNumber("NaughtySoulHealth", 0, "delta"),
 }
 TUNING.WORTOX_SOUL_NEUTRAL = {
-    hunger = SOUL_HUNGER[GetModConfigData("NeutralSoulHunger")] or 25,
-    sanity = SOUL_SANITY[GetModConfigData("NeutralSoulSanity")] or -5,
-    health = SOUL_HEALTH[GetModConfigData("NeutralSoulHealth")] or 0,
+    hunger = ConfigNumber("NeutralSoulHunger", 25, "delta"),
+    sanity = ConfigNumber("NeutralSoulSanity", -5, "delta"),
+    health = ConfigNumber("NeutralSoulHealth", 0, "delta"),
 }
-
-if GetModConfigData("Health") == 12 then
-TUNING.WORTOX_HEALTH = 300
-elseif GetModConfigData("Health") == 11 then
-TUNING.WORTOX_HEALTH = 275
-elseif GetModConfigData("Health") == 10 then
-TUNING.WORTOX_HEALTH = 250
-elseif GetModConfigData("Health") == 9 then
-TUNING.WORTOX_HEALTH = 225
-elseif GetModConfigData("Health") == 8 then
-TUNING.WORTOX_HEALTH = 200
-elseif GetModConfigData("Health") == 7 then
-TUNING.WORTOX_HEALTH = 175
-elseif GetModConfigData("Health") == 6 then
-TUNING.WORTOX_HEALTH = 150
-elseif GetModConfigData("Health") == 5 then
-TUNING.WORTOX_HEALTH = 125
-elseif GetModConfigData("Health") == 4 then
-TUNING.WORTOX_HEALTH = 100
-elseif GetModConfigData("Health") == 3 then
-TUNING.WORTOX_HEALTH = 75
-elseif GetModConfigData("Health") == 2 then
-TUNING.WORTOX_HEALTH = 50
-elseif GetModConfigData("Health") == 1 then
-TUNING.WORTOX_HEALTH = 25
-end
-
-if GetModConfigData("Sanity") == 12 then
-TUNING.WORTOX_SANITY = 300
-elseif GetModConfigData("Sanity") == 11 then
-TUNING.WORTOX_SANITY = 275
-elseif GetModConfigData("Sanity") == 10 then
-TUNING.WORTOX_SANITY = 250
-elseif GetModConfigData("Sanity") == 9 then
-TUNING.WORTOX_SANITY = 225
-elseif GetModConfigData("Sanity") == 8 then
-TUNING.WORTOX_SANITY = 200
-elseif GetModConfigData("Sanity") == 7 then
-TUNING.WORTOX_SANITY = 175
-elseif GetModConfigData("Sanity") == 6 then
-TUNING.WORTOX_SANITY = 150
-elseif GetModConfigData("Sanity") == 5 then
-TUNING.WORTOX_SANITY = 125
-elseif GetModConfigData("Sanity") == 3 then
-TUNING.WORTOX_SANITY = 100
-elseif GetModConfigData("Sanity") == 3 then
-TUNING.WORTOX_SANITY = 75
-elseif GetModConfigData("Sanity") == 2 then
-TUNING.WORTOX_SANITY = 50
-elseif GetModConfigData("Sanity") == 1 then
-TUNING.WORTOX_SANITY = 25
-end
-
-if GetModConfigData("Hunger") == 12 then
-TUNING.WORTOX_HUNGER = 300
-elseif GetModConfigData("Hunger") == 11 then
-TUNING.WORTOX_HUNGER = 275
-elseif GetModConfigData("Hunger") == 10 then
-TUNING.WORTOX_HUNGER = 250
-elseif GetModConfigData("Hunger") == 9 then
-TUNING.WORTOX_HUNGER = 225
-elseif GetModConfigData("Hunger") == 8 then
-TUNING.WORTOX_HUNGER = 200
-elseif GetModConfigData("Hunger") == 7 then
-TUNING.WORTOX_HUNGER = 175
-elseif GetModConfigData("Hunger") == 6 then
-TUNING.WORTOX_HUNGER = 150
-elseif GetModConfigData("Hunger") == 5 then
-TUNING.WORTOX_HUNGER = 125
-elseif GetModConfigData("Hunger") == 3 then
-TUNING.WORTOX_HUNGER = 100
-elseif GetModConfigData("Hunger") == 3 then
-TUNING.WORTOX_HUNGER = 75
-elseif GetModConfigData("Hunger") == 2 then
-TUNING.WORTOX_HUNGER = 50
-elseif GetModConfigData("Hunger") == 1 then
-TUNING.WORTOX_HUNGER = 25
-end
-
-if GetModConfigData("Soulheal") == 12 then
-  TUNING.WORTOX_HEAL = 60
-elseif GetModConfigData("Soulheal") == 11 then
-TUNING.WORTOX_HEAL = 55
-elseif GetModConfigData("Soulheal") == 10 then
-TUNING.WORTOX_HEAL = 50
-elseif GetModConfigData("Soulheal") == 9 then
-TUNING.WORTOX_HEAL = 45
-elseif GetModConfigData("Soulheal") == 8 then
-TUNING.WORTOX_HEAL = 40
-elseif GetModConfigData("Soulheal") == 7 then
-TUNING.WORTOX_HEAL = 35
-elseif GetModConfigData("Soulheal") == 6 then
-TUNING.WORTOX_HEAL = 30
-elseif GetModConfigData("Soulheal") == 5 then
-TUNING.WORTOX_HEAL = 25
-elseif GetModConfigData("Soulheal") == 4 then
-TUNING.WORTOX_HEAL = 20
-elseif GetModConfigData("Soulheal") == 3 then
-TUNING.WORTOX_HEAL = 15
-elseif GetModConfigData("Soulheal") == 2 then
-TUNING.WORTOX_HEAL = 10
-elseif GetModConfigData("Soulheal") == 1 then
-TUNING.WORTOX_HEAL = 5
-end
-
 
 -- Regular food absorption. Souls are separate. Defaults match vanilla (0.5).
 -- SetAbsorptionModifiers(health, hunger, sanity).
-local FOOD_MULT = {
-    [1] = 0, [2] = 0.25, [3] = 0.50, [4] = 0.75, [5] = 1, [6] = 1.25, [7] = 1.5,
-}
 TUNING.WORTOX_FOOD_NICE = {
-    health = FOOD_MULT[GetModConfigData("NiceFoodHealthMult")] or 0.5,
-    hunger = FOOD_MULT[GetModConfigData("NiceFoodHungerMult")] or 0.5,
-    sanity = FOOD_MULT[GetModConfigData("NiceFoodSanityMult")] or 0.5,
+    health = ConfigNumber("NiceFoodHealthMult", 0.5, "mult"),
+    hunger = ConfigNumber("NiceFoodHungerMult", 0.5, "mult"),
+    sanity = ConfigNumber("NiceFoodSanityMult", 0.5, "mult"),
 }
 TUNING.WORTOX_FOOD_NAUGHTY = {
-    health = FOOD_MULT[GetModConfigData("NaughtyFoodHealthMult")] or 0.5,
-    hunger = FOOD_MULT[GetModConfigData("NaughtyFoodHungerMult")] or 0.5,
-    sanity = FOOD_MULT[GetModConfigData("NaughtyFoodSanityMult")] or 0.5,
+    health = ConfigNumber("NaughtyFoodHealthMult", 0.5, "mult"),
+    hunger = ConfigNumber("NaughtyFoodHungerMult", 0.5, "mult"),
+    sanity = ConfigNumber("NaughtyFoodSanityMult", 0.5, "mult"),
 }
 TUNING.WORTOX_FOOD_NEUTRAL = {
-    health = FOOD_MULT[GetModConfigData("NeutralFoodHealthMult")] or 0.5,
-    hunger = FOOD_MULT[GetModConfigData("NeutralFoodHungerMult")] or 0.5,
-    sanity = FOOD_MULT[GetModConfigData("NeutralFoodSanityMult")] or 0.5,
+    health = ConfigNumber("NeutralFoodHealthMult", 0.5, "mult"),
+    hunger = ConfigNumber("NeutralFoodHungerMult", 0.5, "mult"),
+    sanity = ConfigNumber("NeutralFoodSanityMult", 0.5, "mult"),
 }
 -- Vanilla Create() reads this once; we re-apply per inclination below.
 TUNING.WORTOX_FOOD_MULT = TUNING.WORTOX_FOOD_NEUTRAL.hunger
@@ -342,49 +160,84 @@ end
 -- Soul stacks use 40 or 60. Those are vanilla STACK_SIZE_SMALLITEM and
 -- STACK_SIZE_TINYITEM, so stackable_replica.lua must stay the game's copy.
 -- An old override omitted ClearPreviewStackSize and crashed inventory refresh.
-if GetModConfigData("maxsouls") == 12 then
-TUNING.WORTOX_MAX_SOULS = 60
-TUNING.STACK_SIZE_EXTRASMALLITEM = 60
-elseif GetModConfigData("maxsouls") == 11 then
-TUNING.WORTOX_MAX_SOULS = 55
-TUNING.STACK_SIZE_EXTRASMALLITEM = 60
-elseif GetModConfigData("maxsouls") == 10 then
-TUNING.WORTOX_MAX_SOULS = 50
-TUNING.STACK_SIZE_EXTRASMALLITEM = 60
-elseif GetModConfigData("maxsouls") == 9 then
-TUNING.WORTOX_MAX_SOULS = 45
-TUNING.STACK_SIZE_EXTRASMALLITEM = 60
-elseif GetModConfigData("maxsouls") == 8 then
-TUNING.WORTOX_MAX_SOULS = 40
-TUNING.STACK_SIZE_EXTRASMALLITEM = 60
-elseif GetModConfigData("maxsouls") == 7 then
-TUNING.WORTOX_MAX_SOULS = 35
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
-elseif GetModConfigData("maxsouls") == 6 then
-TUNING.WORTOX_MAX_SOULS = 30
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
-elseif GetModConfigData("maxsouls") == 5 then
-TUNING.WORTOX_MAX_SOULS = 25
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
-elseif GetModConfigData("maxsouls") == 4 then
-TUNING.WORTOX_MAX_SOULS = 20
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
-elseif GetModConfigData("maxsouls") == 3 then
-TUNING.WORTOX_MAX_SOULS = 15
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
-elseif GetModConfigData("maxsouls") == 2 then
-TUNING.WORTOX_MAX_SOULS = 10
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
-elseif GetModConfigData("maxsouls") == 1 then
-TUNING.WORTOX_MAX_SOULS = 5
-TUNING.STACK_SIZE_EXTRASMALLITEM = 40
+local maxsouls = ConfigNumber("maxsouls", 20, "range")
+TUNING.WORTOX_MAX_SOULS = maxsouls
+if maxsouls <= 35 then
+    TUNING.STACK_SIZE_EXTRASMALLITEM = 40
+else
+    TUNING.STACK_SIZE_EXTRASMALLITEM = 60
+end
+
+-- Flat /min for overridden hats. Not scaled by ItemSanityMult (dapperness_mult).
+local function GetHatOverridePerMin(item)
+    if item == nil then
+        return nil
+    end
+    local hats = TUNING.WORTOX_HAT_SANITY_PER_MIN
+    if item.prefab == "walrushat" then
+        return hats.walrushat
+    end
+    if item.prefab == "tophat" then
+        if item.components.magiciantool ~= nil then
+            return hats.magician
+        end
+        return hats.tophat
+    end
+    return nil
+end
+
+local function GetEquippableDapperness(owner, equippable)
+    -- Overridden hats contribute 0 to the multed dapperness sum; rate comes from custom_rate_fn.
+    if GetHatOverridePerMin(equippable.inst) ~= nil then
+        return 0
+    end
+    return equippable:GetDapperness(owner, owner.components.sanity.no_moisture_penalty)
+end
+
+-- Must go through Sanity:Recalc via custom_rate_fn (like item dapperness), not a
+-- separate DoDelta timer. Recalc sets self.rate → ratescale → client badge arrows.
+-- Return value is sanity per second; Recalc multiplies by dt.
+local function WortoxCustomSanityRate(inst, dt)
+    local sanity = inst.components.sanity
+    if sanity == nil then
+        return 0
+    end
+
+    local per_min = 0
+
+    local light_blocked = sanity.light_drain_immune_sources ~= nil
+        and sanity.light_drain_immune_sources:Get()
+    if not light_blocked then
+        local world = GLOBAL.TheWorld
+        if world ~= nil and world.state ~= nil then
+            local is_day = world.state.isday and not world:HasTag("cave")
+            if is_day then
+                per_min = per_min + (TUNING.WORTOX_DAY_SANITY_PER_MIN or 0)
+            elseif TUNING.WORTOX_NIGHT_SANITY_PER_MIN ~= nil then
+                per_min = per_min + TUNING.WORTOX_NIGHT_SANITY_PER_MIN
+            end
+        end
+    end
+
+    local inventory = inst.components.inventory
+    if inventory ~= nil then
+        for _, item in pairs(inventory.equipslots) do
+            local override = GetHatOverridePerMin(item)
+            if override ~= nil then
+                per_min = per_min + override
+            end
+        end
+    end
+
+    return per_min / 60
 end
 
 -- Health, hunger, sanity, food, soul cap, and extract range come from TUNING.
 -- Damage, absorption, food mult, and eating a soul are applied on the real Wortox prefab.
 AddPrefabPostInit("wortox", function(inst)
     -- TheWorld is still nil while the player prefab is first built.
-    if TheWorld ~= nil and not TheWorld.ismastersim then
+    local world = GLOBAL.TheWorld
+    if world ~= nil and not world.ismastersim then
         return
     end
 
@@ -393,6 +246,39 @@ AddPrefabPostInit("wortox", function(inst)
     end
     if inst.components.health ~= nil then
         inst.components.health:SetAbsorptionAmount(TUNING.WORTOX_ABSORPTION)
+    end
+
+    if inst.components.sanity ~= nil then
+        inst.components.sanity.dapperness_mult = TUNING.WORTOX_ITEM_SANITY_MULT
+        inst.components.sanity.get_equippable_dappernessfn = GetEquippableDapperness
+
+        -- Flat night/min replaces vanilla darkness scaling.
+        if TUNING.WORTOX_NIGHT_SANITY_PER_MIN ~= nil then
+            inst.components.sanity.night_drain_mult = 0
+        end
+
+        local prev_fn = inst.components.sanity.custom_rate_fn
+        inst.components.sanity.custom_rate_fn = function(sinst, dt)
+            local extra = WortoxCustomSanityRate(sinst, dt)
+            if prev_fn ~= nil then
+                return extra + prev_fn(sinst, dt)
+            end
+            return extra
+        end
+
+        -- Vanilla badge ignores tiny rates (down arrow needs < -0.02/sec ≈ -1.2/min).
+        -- Force LOW arrows whenever net rate is non-zero but still NEUTRAL.
+        local sanity = inst.components.sanity
+        local old_recalc = sanity.Recalc
+        sanity.Recalc = function(self, dt)
+            old_recalc(self, dt)
+            local RATE_SCALE = GLOBAL.RATE_SCALE
+            if self.rate < 0 and self.ratescale == RATE_SCALE.NEUTRAL then
+                self.ratescale = RATE_SCALE.DECREASE_LOW
+            elseif self.rate > 0 and self.ratescale == RATE_SCALE.NEUTRAL then
+                self.ratescale = RATE_SCALE.INCREASE_LOW
+            end
+        end
     end
 
     ApplyFoodMult(inst)
@@ -418,7 +304,8 @@ end)
 
 -- The game soul has the sloweat tag the eat state requires. Only the stack limit is custom.
 AddPrefabPostInit("wortox_soul", function(inst)
-    if TheWorld ~= nil and not TheWorld.ismastersim then
+    local world = GLOBAL.TheWorld
+    if world ~= nil and not world.ismastersim then
         return
     end
     if inst.components.stackable == nil then
