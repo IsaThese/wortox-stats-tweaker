@@ -163,83 +163,36 @@ elseif GetModConfigData("SanityAura") == 1 then
 TUNING.WORTOX_SANITY_AURA_MULT = 0
 end
 
-if GetModConfigData("SoulHunger") == 12 then
-TUNING.CALORIES_CUSTOM = 40
-elseif GetModConfigData("SoulHunger") == 11 then
-TUNING.CALORIES_CUSTOM = 35
-elseif GetModConfigData("SoulHunger") == 10 then
-TUNING.CALORIES_CUSTOM = 30
-elseif GetModConfigData("SoulHunger") == 9 then
-TUNING.CALORIES_CUSTOM = 25
-elseif GetModConfigData("SoulHunger") == 8 then
-TUNING.CALORIES_CUSTOM = 22
-elseif GetModConfigData("SoulHunger") == 7 then
-TUNING.CALORIES_CUSTOM = 18
-elseif GetModConfigData("SoulHunger") == 6 then
-TUNING.CALORIES_CUSTOM = 15
-elseif GetModConfigData("SoulHunger") == 5 then
-TUNING.CALORIES_CUSTOM = 12
-elseif GetModConfigData("SoulHunger") == 4 then
-TUNING.CALORIES_CUSTOM = 10
-elseif GetModConfigData("SoulHunger") == 3 then
-TUNING.CALORIES_CUSTOM = 8
-elseif GetModConfigData("SoulHunger") == 2 then
-TUNING.CALORIES_CUSTOM = 5
-elseif GetModConfigData("SoulHunger") == 1 then
-TUNING.CALORIES_CUSTOM = 0
-end
+-- Config index -> eat-soul deltas. Defaults match vanilla OnEatSoul:
+-- hunger CALORIES_MED (+25), sanity nice -10 / naughty 0 / neutral -5, health +0.
+local SOUL_HUNGER = {
+    [1] = 0, [2] = 5, [3] = 8, [4] = 10, [5] = 12, [6] = 15,
+    [7] = 18, [8] = 22, [9] = 25, [10] = 30, [11] = 35, [12] = 40,
+}
+local SOUL_SANITY = {
+    [1] = -20, [2] = -15, [3] = -10, [4] = -8, [5] = -5, [6] = -3,
+    [7] = -1, [8] = 0, [9] = 1, [10] = 3, [11] = 5, [12] = 10,
+}
+local SOUL_HEALTH = {
+    [1] = 0, [2] = 2.5, [3] = 5, [4] = 7.5, [5] = 10, [6] = 12.5,
+    [7] = 15, [8] = 17.5, [9] = 20, [10] = 22.5, [11] = 25, [12] = 30,
+}
 
-if GetModConfigData("SoulSanity") == 12 then
-TUNING.SANITY_CUSTOM = 10
-elseif GetModConfigData("SoulSanity") == 11 then
-TUNING.SANITY_CUSTOM = 5
-elseif GetModConfigData("SoulSanity") == 10 then
-TUNING.SANITY_CUSTOM = 3
-elseif GetModConfigData("SoulSanity") == 9 then
-TUNING.SANITY_CUSTOM = 1
-elseif GetModConfigData("SoulSanity") == 8 then
-TUNING.SANITY_CUSTOM = 0
-elseif GetModConfigData("SoulSanity") == 7 then
-TUNING.SANITY_CUSTOM = -1
-elseif GetModConfigData("SoulSanity") == 6 then
-TUNING.SANITY_CUSTOM = -3
-elseif GetModConfigData("SoulSanity") == 5 then
-TUNING.SANITY_CUSTOM = -5
-elseif GetModConfigData("SoulSanity") == 4 then
-TUNING.SANITY_CUSTOM = -8
-elseif GetModConfigData("SoulSanity") == 3 then
-TUNING.SANITY_CUSTOM = -12
-elseif GetModConfigData("SoulSanity") == 2 then
-TUNING.SANITY_CUSTOM = -15
-elseif GetModConfigData("SoulSanity") == 1 then
-TUNING.SANITY_CUSTOM = -20
-end
-
-if GetModConfigData("SoulHealth") == 12 then
-TUNING.HEALING_CUSTOM = 30
-elseif GetModConfigData("SoulHealth") == 11 then
-TUNING.HEALING_CUSTOM = 25
-elseif GetModConfigData("SoulHealth") == 10 then
-TUNING.HEALING_CUSTOM = 22.5
-elseif GetModConfigData("SoulHealth") == 9 then
-TUNING.HEALING_CUSTOM = 20
-elseif GetModConfigData("SoulHealth") == 8 then
-TUNING.HEALING_CUSTOM = 17.5
-elseif GetModConfigData("SoulHealth") == 7 then
-TUNING.HEALING_CUSTOM = 15
-elseif GetModConfigData("SoulHealth") == 6 then
-TUNING.HEALING_CUSTOM = 12.5
-elseif GetModConfigData("SoulHealth") == 5 then
-TUNING.HEALING_CUSTOM = 10
-elseif GetModConfigData("SoulHealth") == 4 then
-TUNING.HEALING_CUSTOM = 7.5
-elseif GetModConfigData("SoulHealth") == 3 then
-TUNING.HEALING_CUSTOM = 5
-elseif GetModConfigData("SoulHealth") == 2 then
-TUNING.HEALING_CUSTOM = 2.5
-elseif GetModConfigData("SoulHealth") == 1 then
-TUNING.HEALING_CUSTOM = 0
-end
+TUNING.WORTOX_SOUL_NICE = {
+    hunger = SOUL_HUNGER[GetModConfigData("NiceSoulHunger")] or 25,
+    sanity = SOUL_SANITY[GetModConfigData("NiceSoulSanity")] or -10,
+    health = SOUL_HEALTH[GetModConfigData("NiceSoulHealth")] or 0,
+}
+TUNING.WORTOX_SOUL_NAUGHTY = {
+    hunger = SOUL_HUNGER[GetModConfigData("NaughtySoulHunger")] or 25,
+    sanity = SOUL_SANITY[GetModConfigData("NaughtySoulSanity")] or 0,
+    health = SOUL_HEALTH[GetModConfigData("NaughtySoulHealth")] or 0,
+}
+TUNING.WORTOX_SOUL_NEUTRAL = {
+    hunger = SOUL_HUNGER[GetModConfigData("NeutralSoulHunger")] or 25,
+    sanity = SOUL_SANITY[GetModConfigData("NeutralSoulSanity")] or -5,
+    health = SOUL_HEALTH[GetModConfigData("NeutralSoulHealth")] or 0,
+}
 
 if GetModConfigData("Health") == 12 then
 TUNING.WORTOX_HEALTH = 300
@@ -416,9 +369,15 @@ AddPrefabPostInit("wortox", function(inst)
     inst.components.health:SetAbsorptionAmount(TUNING.WORTOX_ABSORPTION)
 
     inst.components.souleater:SetOnEatSoulFn(function(eater)
-        eater.components.sanity:DoDelta(TUNING.SANITY_CUSTOM)
-        eater.components.hunger:DoDelta(TUNING.CALORIES_CUSTOM)
-        eater.components.health:DoDelta(TUNING.HEALING_CUSTOM)
+        local stats = TUNING.WORTOX_SOUL_NEUTRAL
+        if eater.wortox_inclination == "nice" then
+            stats = TUNING.WORTOX_SOUL_NICE
+        elseif eater.wortox_inclination == "naughty" then
+            stats = TUNING.WORTOX_SOUL_NAUGHTY
+        end
+        eater.components.hunger:DoDelta(stats.hunger)
+        eater.components.sanity:DoDelta(stats.sanity)
+        eater.components.health:DoDelta(stats.health)
         eater:DoCheckSoulsAdded()
     end)
 end)
